@@ -521,7 +521,7 @@ function fetchExecutionResults ([bool]$fetchPartialResults = $false) {
         # Not all results are available (E.g. cancelled events, configuration errors) 
         elseif ( $status -eq 206 ) {
             log "WRN" "Not all execution results have been returned for execution with id ""$executionId"". Check AOS, DEX Server and DEX agent logs."
-            $script:executionResults="$responseBody"
+            $script:executionResults=$content
         }
         # Handle non existing results when fetchPartialResults option is activated
         elseif ( $fetchPartialResults -eq $true ) {
@@ -565,6 +565,11 @@ if ( [String]::IsNullOrEmpty($toscaServerUrl) ) {
     log "ERR" "Mandatory parameter ""projectName"" is not set"
 } else {
     $validationFailed = $false
+}
+
+# If the toscaServerUrl contains and trailing slash remove it, as this breaks API calls
+if ($toscaServerUrl -match "/$") {
+	$toscaServerUrl = $toscaServerUrl.Substring(0, $toscaServerUrl.Length - 1)
 }
 
 # Print help and exit if validation failed
